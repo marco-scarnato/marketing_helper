@@ -1,0 +1,67 @@
+services:
+  # PostgreSQL database for application persistence.
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: creativehub
+      POSTGRES_PASSWORD: creativehub
+      POSTGRES_DB: creativehub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./marketing_helper_be/scripts/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U creativehub']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # MongoDB database for document storage.
+  mongo:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_DATABASE: creativehub
+    volumes:
+      - mongo_data:/data/db
+      - ./marketing_helper_be/scripts/mongo/init.js:/docker-entrypoint-initdb.d/init.js
+    ports:
+      - '27017:27017'
+    healthcheck:
+      test: ['CMD-SHELL', "mongosh --eval \"db.adminCommand('ping')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # FastAPI backend with local source mounted for hot reload.
+  be:
+    build:
+      context: ./marketing_helper_be
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    env_file:
+      - ./marketing_helper_be/.env
+    volumes:
+      - ./marketing_helper_be:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  # Angular frontend served by nginx.
+  fe:
+    build:
+      context: ./marketing_helper_fe
+      dockerfile: Dockerfile
+    ports:
+      - '4200:80'
+    depends_on:
+      - be
+
+volumes:
+  postgres_data:
+  mongo_data:
