@@ -1,0 +1,6 @@
+[submodule "marketing_helper_fe"]
+	path = marketing_helper_fe
+	url = https://github.com/marco-scarnato/marketing_helper_fe.git
+[submodule "marketing_helper_be"]
+	path = marketing_helper_be
+	url = https://github.com/marco-scarnato/marketing_helper_be.git
