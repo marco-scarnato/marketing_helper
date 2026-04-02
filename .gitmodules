@@ -4,3 +4,6 @@
 [submodule "marketing_helper_be"]
 	path = marketing_helper_be
 	url = https://github.com/marco-scarnato/marketing_helper_be.git
+[submodule "marketing_helper_agents"]
+	path = marketing_helper_agents
+	url = https://github.com/marco-scarnato/marketing_helper_agents.git
